@@ -1,11 +1,16 @@
 Attribute VB_Name = "mdlException"
 Option Explicit
 
+Private Const EGYSEGAR_COL As Integer = 2
+Private Const MENNYISEG_COL As Integer = 3
+Private Const OSSZAR_COL As Integer = 4
+
 Sub riportok()
+
 On Error GoTo eh
     
     Dim utvonal As String
-    utvonal = "" 'ide johet a fajl elelresi utja
+    utvonal = "" 'fajl helye
     Dim wb As Workbook
     Set wb = Workbooks.Open(utvonal)
     
@@ -18,94 +23,84 @@ On Error GoTo eh
 
 eh:
     wb.Close SaveChanges:=False
-    
     Select Case Err.Number
         Case 0
-            Debug.Print "A riport elkészült!"
+            MsgBox "A riport elkészült!"
         Case vbObjectError + 555
-            Debug.Print "Csak számokkal végezhetõek el a mûveletek!" & vbNewLine & "Hiba oka: " & Err.Description & vbNewLine & "Hiba forrása: " & Err.Source
+            MsgBox "Oops: " & vbNewLine & Err.Description & vbNewLine & Err.Source
         Case Else
-            Debug.Print "Váratlan hiba történt!" & vbNewLine & "Hiba oka: " & Err.Description & vbNewLine & "Hiba forrása: " & Err.Source
+            MsgBox "Hiba történt: " & vbNewLine & Err.Description & vbNewLine & Err.Source
     End Select
-
 End Sub
 
-Function cellabolSzam(ByRef szam As Range) As Double
+Function cellabolSzam(ertek As Range) As Double
+
 On Error GoTo eh
 
-    If IsNumeric(szam.Value2) Then
-        cellabolSzam = CDbl(szam)
+    If IsNumeric(ertek.Value) Then
+        cellabolSzam = CDbl(ertek.Value)
     Else
         Err.Raise _
             vbObjectError + 555, _
             "VBAProject", _
-            "A(z) " & szam.Address & " cella értéke nem szám!"
+            "A(z) " & ertek.Address & " cella értéke nem szám!"
     End If
-    
+
+done:
+    Exit Function
 eh:
-    Select Case Err.Number
-        Case 0: Exit Function
-        Case Else
-            Err.Raise Err.Number, Err.Source & vbNewLine & "cellabolSzam", Err.Description
-    End Select
+    Err.Raise Err.Number, Err.Source & vbNewLine & "cellabolSzam", Err.Description
 End Function
 
 Function atlagEgysegar(rg As Range) As Double
-On Error GoTo eh
 
-    Const EGYSEGAR_COL As Integer = 2
+On Error GoTo eh
     
     Dim osszeg As Long
+    Dim szamlalo As Integer
     
     Dim lv As Integer
     For lv = 2 To rg.Rows.Count
         osszeg = osszeg + cellabolSzam(rg(lv, EGYSEGAR_COL))
+        szamlalo = szamlalo + 1
     Next lv
     
-    atlagEgysegar = osszeg / (rg.Rows.Count - 1)
+    atlagEgysegar = osszeg / szamlalo
     
+done:
+    Exit Function
 eh:
-    Select Case Err.Number
-        Case 0: Exit Function
-        Case Else
-            Err.Raise Err.Number, Err.Source & vbNewLine & "atlagEgysegar", Err.Description
-    End Select
-    
+    Err.Raise Err.Number, Err.Source & vbNewLine & "atlagEgysegar", Err.Description
+        
 End Function
 
 Function teljesKeszlet(rg As Range) As Long
+
 On Error GoTo eh
-    
-    Const MENNYISEG_COL As Integer = 3
 
     Dim lv As Integer
     For lv = 2 To rg.Rows.Count
         teljesKeszlet = teljesKeszlet + cellabolSzam(rg(lv, MENNYISEG_COL))
     Next lv
 
+done:
+    Exit Function
 eh:
-    Select Case Err.Number
-        Case 0: Exit Function
-        Case Else
-            Err.Raise Err.Number, Err.Source & vbNewLine & "teljesKeszlet", Err.Description
-    End Select
+    Err.Raise Err.Number, Err.Source & vbNewLine & "teljesKeszlet", Err.Description
 End Function
 
 Function osszAr(rg As Range) As Long
+
 On Error GoTo eh
-    
-    Const OSSZAR_COL As Integer = 4
     
     Dim lv As Integer
     For lv = 2 To rg.Rows.Count
         osszAr = osszAr + cellabolSzam(rg(lv, OSSZAR_COL))
     Next lv
     
+done:
+    Exit Function
 eh:
-    Select Case Err.Number
-        Case 0: Exit Function
-        Case Else
-            Err.Raise Err.Number, Err.Source & vbNewLine & "osszAr", Err.Description
-    End Select
+    Err.Raise Err.Number, Err.Source & vbNewLine & "osszAr", Err.Description
 End Function
 
