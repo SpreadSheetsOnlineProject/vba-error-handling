@@ -10,7 +10,7 @@ Sub riportok()
 On Error GoTo eh
     
     Dim utvonal As String
-    utvonal = "" 'fajl helye
+    utvonal = "C:\offlineTMP\youtube\kivetelkezeles-mint-egy-profi\zoldseges.xlsx" 'fajl helye
     Dim wb As Workbook
     Set wb = Workbooks.Open(utvonal)
     
@@ -33,17 +33,19 @@ eh:
     End Select
 End Sub
 
-Function cellabolSzam(ertek As Range) As Double
+Function cellabolSzam(ertek As Range, Optional ByRef szamlalo As Integer = 0) As Double
 
 On Error GoTo eh
 
     If IsNumeric(ertek.Value) Then
         cellabolSzam = CDbl(ertek.Value)
+        szamlalo = szamlalo + 1
     Else
-        Err.Raise _
-            vbObjectError + 555, _
-            "VBAProject", _
-            "A(z) " & ertek.Address & " cella értéke nem szám!"
+        cellabolSzam = 0
+'        Err.Raise _
+'            vbObjectError + 555, _
+'            "VBAProject", _
+'            "A(z) " & ertek.Address & " cella értéke nem szám!"
     End If
 
 done:
@@ -61,8 +63,7 @@ On Error GoTo eh
     
     Dim lv As Integer
     For lv = 2 To rg.Rows.Count
-        osszeg = osszeg + cellabolSzam(rg(lv, EGYSEGAR_COL))
-        szamlalo = szamlalo + 1
+        osszeg = osszeg + cellabolSzam(rg(lv, EGYSEGAR_COL), szamlalo)
     Next lv
     
     atlagEgysegar = osszeg / szamlalo
