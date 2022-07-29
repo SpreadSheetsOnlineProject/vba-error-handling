@@ -15,3 +15,4 @@ Minta táblázat:
 | paradicsom	| 980 Ft |	21,0 kg	| 20 580 Ft |
 
 Videó: 
+https://www.youtube.com/watch?v=yt1KjkC16_c
